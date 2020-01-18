@@ -1,7 +1,7 @@
 This commandline application for the Micronucleus bootloader is written by
 ihsan Kehribar <ihsan@kehribar.me> and Bluebie <a@creativepony.com>
 
-It's been tested casually on Mac, Windows, and Linux, and aught to work on all
+It's been tested casually on Mac, Windows, and Linux, and ought to work on all
 three. To make and install, do the regular 'make; sudo make install' on unixes.
 
 Building on windows requires mingw32+msys with lib-winusb32. Possibly it can also
