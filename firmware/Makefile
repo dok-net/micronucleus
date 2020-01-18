@@ -25,9 +25,15 @@ include $(CONFIGPATH)/Makefile.inc
 PROGRAMMER ?= -c USBasp
 # PROGRAMMER contains AVRDUDE options to address your programmer
 
+ifeq ($(findstring Microsoft, $(shell uname -r)), Microsoft)
+	EXE_SUFFIX = .exe
+else
+	EXE_SUFFIX =
+endif
+
 # Tools:
-AVRDUDE = avrdude $(PROGRAMMER) -p $(DEVICE) 
-CC = avr-gcc
+AVRDUDE = avrdude$(EXE_SUFFIX) $(PROGRAMMER) -p $(DEVICE) 
+CC = avr-gcc$(EXE_SUFFIX)
 
 # Options:
 CFLAGS += -I. -g2 -Os # -Wall
@@ -80,19 +86,19 @@ main.bin:	$(OBJECTS)
 main.hex:	main.bin
 	@echo Building Micronucleus configuration: $(CONFIG)
 	@rm -f main.hex main.eep.hex
-	@avr-objcopy -j .text -j .data -O ihex main.bin main.hex
+	@avr-objcopy$(EXE_SUFFIX) -j .text -j .data -O ihex main.bin main.hex
 	@echo Size of sections:
-	@avr-size main.bin	
+	@avr-size$(EXE_SUFFIX) main.bin	
 	@echo Size of binary hexfile. Use the "data" size to calculate the bootloader address:
-	@avr-size main.hex
+	@avr-size$(EXE_SUFFIX) main.hex
 
 upgrade: main.bin
-	avr-objcopy -O binary main.bin main.raw
-	avr-objcopy -I binary -O elf32-avr \
+	avr-objcopy$(EXE_SUFFIX) -O binary main.bin main.raw
+	avr-objcopy$(EXE_SUFFIX) -I binary -O elf32-avr \
         --rename-section .data=.text \
         --redefine-sym _binary_main_raw_start=loader \
         --redefine-sym _binary_main_raw_end=loader_end \
 		main.raw bootloader_linkable.o	
 	
 disasm:	main.bin
-	@avr-objdump -d -S main.bin >main.lss
+	@avr-objdump$(EXE_SUFFIX) -d -S main.bin >main.lss

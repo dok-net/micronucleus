@@ -136,9 +136,15 @@ FUSEOPT_t85_DISABLERESET = -U lfuse:w:0xe1:m -U efuse:w:0xfe:m -U hfuse:w:0x5d:m
 
 ###############################################################################
 
+ifeq ($(findstring Microsoft, $(shell uname -r)), Microsoft)
+	EXE_SUFFIX = .exe
+else
+	EXE_SUFFIX =
+endif
+
 # Tools:
-AVRDUDE = avrdude $(PROGRAMMER) -p $(DEVICE)
-CC = avr-gcc
+AVRDUDE = avrdude$(EXE_SUFFIX) $(PROGRAMMER) -p $(DEVICE)
+CC = avr-gcc$(EXE_SUFFIX)
 
 # Options:
 DEFINES = -DAPP_ADDRESS=0x$(APP_ADDRESS) #-DDEBUG_LEVEL=2
@@ -192,13 +198,13 @@ upgrade.bin:	$(OBJECTS)
 
 upgrade.hex:	upgrade.bin
 	rm -f upgrade.hex upgrade.eep.hex
-	avr-objcopy -j .text -j .data -O ihex upgrade.bin upgrade-app.hex
+	avr-objcopy$(EXE_SUFFIX) -j .text -j .data -O ihex upgrade.bin upgrade-app.hex
 	cat upgrade-prefix.hex upgrade-app.hex > upgrade.hex
 	rm upgrade-app.hex
-	avr-size upgrade.hex
+	avr-size$(EXE_SUFFIX) upgrade.hex
 
 disasm:	upgrade.bin
-	avr-objdump -d upgrade.bin
+	avr-objdump$(EXE_SUFFIX) -d upgrade.bin
 
 cpp:
 	$(CC) $(CFLAGS) -E upgrade.c
